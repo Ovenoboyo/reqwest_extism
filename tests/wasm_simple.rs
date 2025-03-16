@@ -1,5 +1,7 @@
-#![cfg(target_arch = "wasm32")]
-
+#![cfg(all(
+    target_arch = "wasm32",
+    any(target_os = "unknown", target_os = "emscripten")
+))]
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_test::*;
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);

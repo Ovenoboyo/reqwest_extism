@@ -246,7 +246,14 @@ compile_error!(
 
 macro_rules! if_wasm {
     ($($item:item)*) => {$(
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "emscripten")))]
+        $item
+    )*}
+}
+
+macro_rules! if_wasi {
+    ($($item:item)*) => {$(
+        #[cfg(all(target_arch = "wasm32", target_os = "wasi"))]
         $item
     )*}
 }
@@ -366,6 +373,16 @@ if_wasm! {
     mod util;
 
     pub use self::wasm::{Body, Client, ClientBuilder, Request, RequestBuilder, Response};
+    #[cfg(feature = "multipart")]
+    pub use self::wasm::multipart;
+}
+
+if_wasi! {
+    mod wasi;
+    mod util;
+
+    pub use self::wasi::{Body, Client, ClientBuilder, Request, RequestBuilder, Response};
+
     #[cfg(feature = "multipart")]
     pub use self::wasm::multipart;
 }
