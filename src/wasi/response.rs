@@ -79,19 +79,19 @@ impl Response {
     /// Try to deserialize the response body as JSON.
     #[cfg(feature = "json")]
     #[cfg_attr(docsrs, doc(cfg(feature = "json")))]
-    pub fn json<T: DeserializeOwned>(self) -> crate::Result<T> {
+    pub async fn json<T: DeserializeOwned>(self) -> crate::Result<T> {
         self.response.json().map_err(crate::error::builder)
     }
 
     /// Get the response text.
-    pub fn text(self) -> crate::Result<String> {
-        let bytes = self.bytes()?;
+    pub async fn text(self) -> crate::Result<String> {
+        let bytes = self.bytes().await?;
         let string = String::from_bytes(&bytes).map_err(crate::error::builder)?;
         Ok(string)
     }
 
     /// Get the response as bytes
-    pub fn bytes(self) -> crate::Result<Bytes> {
+    pub async fn bytes(self) -> crate::Result<Bytes> {
         Ok(self.response.body().into())
     }
 
