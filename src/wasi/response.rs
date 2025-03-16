@@ -80,7 +80,7 @@ impl Response {
     #[cfg(feature = "json")]
     #[cfg_attr(docsrs, doc(cfg(feature = "json")))]
     pub fn json<T: DeserializeOwned>(self) -> crate::Result<T> {
-        self.response.json()
+        self.response.json().map_err(crate::error::builder)
     }
 
     /// Get the response text.
