@@ -2,6 +2,7 @@ use extism_pdk::HttpRequest;
 use http::header::USER_AGENT;
 use http::{HeaderMap, HeaderValue, Method};
 use std::convert::TryInto;
+use std::future::Future;
 use std::{fmt, sync::Arc};
 
 use super::{Request, RequestBuilder, Response};
@@ -108,7 +109,10 @@ impl Client {
     ///
     /// This method fails if there was an error while sending request,
     /// redirect loop was detected or redirect limit was exhausted.
-    pub fn execute(&self, request: Request) -> Result<Response, crate::Error> {
+    pub fn execute(
+        &self,
+        request: Request,
+    ) -> impl Future<Output = Result<Response, crate::Error>> {
         self.execute_request(request)
     }
 
@@ -125,7 +129,10 @@ impl Client {
         }
     }
 
-    pub(super) fn execute_request(&self, mut req: Request) -> crate::Result<Response> {
+    pub(super) fn execute_request(
+        &self,
+        mut req: Request,
+    ) -> impl Future<Output = Result<Response, crate::Error>> {
         self.merge_headers(&mut req);
         fetch(req)
     }
@@ -153,7 +160,7 @@ impl fmt::Debug for ClientBuilder {
     }
 }
 
-fn fetch(req: Request) -> crate::Result<Response> {
+async fn fetch(req: Request) -> crate::Result<Response> {
     let mut request = HttpRequest::new(req.url().as_str()).with_method(req.method().as_str());
     for (header_name, header_val) in req.headers().into_iter() {
         request = request.with_header(
