@@ -4,7 +4,7 @@
 //
 // `tokio = { version = "1", features = ["full"] }`
 #[cfg(feature = "http3")]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     use http::Version;
@@ -43,7 +43,7 @@ async fn main() -> Result<(), reqwest::Error> {
     Ok(())
 }
 
-// The [cfg(not(target_arch = "wasm32"))] above prevent building the tokio::main function
+// The [cfg(all(target_arch = "wasm32", target_os = "unknown"))] above prevent building the tokio::main function
 // for wasm32 target, because tokio isn't compatible with wasm32.
 // If you aren't building for wasm32, you don't need that line.
 // The two lines below avoid the "'main' function not found" error when building for wasm32 target.

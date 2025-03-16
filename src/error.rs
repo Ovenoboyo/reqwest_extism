@@ -229,14 +229,20 @@ impl StdError for Error {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(
+    target_arch = "wasm32",
+    any(target_os = "unknown", target_os = "emscripten")
+))]
 impl From<crate::error::Error> for wasm_bindgen::JsValue {
     fn from(err: Error) -> wasm_bindgen::JsValue {
         js_sys::Error::from(err).into()
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(
+    target_arch = "wasm32",
+    any(target_os = "unknown", target_os = "emscripten")
+))]
 impl From<crate::error::Error> for js_sys::Error {
     fn from(err: Error) -> js_sys::Error {
         js_sys::Error::new(&format!("{err}"))
