@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
@@ -167,7 +167,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@master
@@ -208,7 +208,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@master
@@ -249,7 +249,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -269,7 +269,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@nightly
@@ -297,7 +297,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Resolve MSRV aware dependencies
+        run: cargo update
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
 
       - name: Get MSRV package metadata
         id: metadata
@@ -307,18 +313,6 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ steps.metadata.outputs.msrv }}
-
-      - name: Fix log and tokio versions
-        run: |
-          cargo update
-          cargo update -p log --precise 0.4.18
-          cargo update -p tokio --precise 1.29.1
-          cargo update -p tokio-util --precise 0.7.11
-          cargo update -p idna_adapter --precise 1.1.0
-          cargo update -p hashbrown --precise 0.15.0
-          cargo update -p native-tls --precise 0.2.13
-          cargo update -p once_cell --precise 1.20.3
-          cargo update -p tracing-core --precise 0.1.33
 
       - uses: Swatinem/rust-cache@v2
 
@@ -333,7 +327,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
@@ -352,7 +346,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
