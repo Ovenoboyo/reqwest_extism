@@ -12,11 +12,13 @@ use serde::de::DeserializeOwned;
 pub struct Response {
     status_code: StatusCode,
     headers: HeaderMap,
-    response: extism_pdk::HttpResponse,
+    body: Bytes,
     // Boxed to save space (11 words to 1 word), and it's not accessed
     // frequently internally.
     url: Box<Url>,
 }
+
+unsafe impl Send for Response {}
 
 impl Response {
     pub(super) fn new(url: Url, response: extism_pdk::HttpResponse) -> Response {
@@ -28,11 +30,15 @@ impl Response {
             );
         }
 
+        let status_code =
+            StatusCode::from_u16(response.status_code()).expect("Invalid status code");
+        let body = response.body().into();
+
         Response {
             url: Box::new(url),
-            status_code: StatusCode::from_u16(response.status_code()).expect("Invalid status code"),
+            status_code,
             headers: header_map,
-            response,
+            body,
         }
     }
 
@@ -80,19 +86,22 @@ impl Response {
     #[cfg(feature = "json")]
     #[cfg_attr(docsrs, doc(cfg(feature = "json")))]
     pub async fn json<T: DeserializeOwned>(self) -> crate::Result<T> {
-        self.response.json().map_err(crate::error::builder)
+        serde_json::from_slice(&self.body).map_err(crate::error::builder)
     }
 
     /// Get the response text.
     pub async fn text(self) -> crate::Result<String> {
-        let bytes = self.bytes().await?;
-        let string = String::from_bytes(&bytes).map_err(crate::error::builder)?;
-        Ok(string)
+        String::from_bytes(&self.body).map_err(crate::error::builder)
     }
 
     /// Get the response as bytes
     pub async fn bytes(self) -> crate::Result<Bytes> {
-        Ok(self.response.body().into())
+        Ok(self.body)
+    }
+
+    /// Get the response as bytes
+    pub async fn chunk(&mut self) -> crate::Result<Option<Bytes>> {
+        Ok(Some(self.body.clone()))
     }
 
     /// Turn a response into an error if the server returned an error.

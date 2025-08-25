@@ -14,11 +14,11 @@ use crate::header::{HeaderMap, HeaderName, HeaderValue, CONTENT_TYPE};
 
 /// A request which can be executed with `Client::execute()`.
 pub struct Request {
-    method: Method,
-    url: Url,
-    headers: HeaderMap,
-    body: Option<Body>,
-    timeout: Option<Duration>,
+    pub(crate) method: Method,
+    pub(crate) url: Url,
+    pub(crate) headers: HeaderMap,
+    pub(crate) body: Option<Body>,
+    pub(crate) timeout: Option<Duration>,
 }
 
 /// A builder to construct the properties of a `Request`.
@@ -371,6 +371,11 @@ impl RequestBuilder {
                 client: self.client.clone(),
                 request: Ok(req),
             })
+    }
+
+    /// no-op
+    pub fn fetch_mode_no_cors(self) -> Self {
+        self
     }
 }
 

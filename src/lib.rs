@@ -378,8 +378,7 @@ if_hyper! {
     #[cfg(feature = "blocking")]
     pub mod blocking;
     mod connect;
-    #[cfg(feature = "cookies")]
-    pub mod cookie;
+
     pub mod dns;
     mod proxy;
     pub mod redirect;
@@ -391,6 +390,9 @@ if_hyper! {
     #[cfg(docsrs)]
     pub use connect::uds::UnixSocketProvider;
 }
+
+#[cfg(feature = "cookies")]
+pub mod cookie;
 
 if_wasm! {
     mod wasm;
@@ -405,7 +407,7 @@ if_wasi! {
     mod wasi;
     mod util;
 
-    pub use self::wasi::{Body, Client, ClientBuilder, Request, RequestBuilder, Response};
+    pub use self::wasi::{Body, Client, ClientBuilder, Request, RequestBuilder, Response, Proxy};
 
     #[cfg(feature = "multipart")]
     pub use self::wasm::multipart;
