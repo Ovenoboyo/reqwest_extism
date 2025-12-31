@@ -311,9 +311,8 @@ impl std::fmt::Debug for Config {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let mut build = f.debug_struct("Config");
 
-        if cfg!(feature = "cookies") {
-            build.field("cookie_store", &self.cookie_store.is_some());
-        }
+        #[cfg(feature = "cookies")] 
+        build.field("cookie_store", &self.cookie_store.is_some());
 
         build.field("headers", &self.headers).finish()
     }

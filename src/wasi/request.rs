@@ -4,13 +4,20 @@ use std::time::Duration;
 
 use bytes::Bytes;
 use http::{request::Parts, Method, Request as HttpRequest};
+
+#[cfg(any(feature = "json", feature = "query", feature = "form"))]
 use serde::Serialize;
+
 #[cfg(feature = "json")]
 use serde_json;
+
 use url::Url;
 
 use super::{Body, Client, Response};
-use crate::header::{HeaderMap, HeaderName, HeaderValue, CONTENT_TYPE};
+use crate::header::{HeaderMap, HeaderName, HeaderValue};
+
+#[cfg(any(feature = "json", feature = "form"))]
+use crate::header::CONTENT_TYPE;
 
 /// A request which can be executed with `Client::execute()`.
 pub struct Request {
@@ -150,6 +157,7 @@ impl RequestBuilder {
     /// # Errors
     /// This method will fail if the object you provide cannot be serialized
     /// into a query string.
+    #[cfg(feature = "query")]
     pub fn query<T: Serialize + ?Sized>(mut self, query: &T) -> RequestBuilder {
         let mut error = None;
         if let Ok(ref mut req) = self.request {
@@ -182,6 +190,7 @@ impl RequestBuilder {
     ///
     /// This method fails if the passed value cannot be serialized into
     /// url encoded format
+    #[cfg(feature = "form")]
     pub fn form<T: Serialize + ?Sized>(mut self, form: &T) -> RequestBuilder {
         let mut error = None;
         if let Ok(ref mut req) = self.request {
